@@ -1,27 +1,18 @@
-import { OktaAuth } from '@okta/okta-auth-js';
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
+import Auth from '@okta/okta-vue'
 
-const oktaAuth = new OktaAuth({
+Vue.use(Auth, {
   issuer: 'https://{yourOktaDomain}/oauth2/default',
   clientId: '{yourClientId}',
-  redirectUri: window.location.origin + '/callback'
-});
+  redirectUri: window.location.origin + '/callback',
+  scopes: ['openid', 'profile', 'email']
+})
 
-document.getElementById('login').addEventListener('click', () => {
-  signInWithOkta('user@example.com', 'password');
-});
+router.beforeEach(Vue.prototype.$auth.authRedirectGuard())
 
-async function signInWithOkta(username, password) {
-  try {
-    const transaction = await oktaAuth.signIn({ username, password });
-    if (transaction.status === 'SUCCESS') {
-      oktaAuth.token.getWithRedirect({
-        sessionToken: transaction.sessionToken,
-        scopes: ['openid', 'email', 'profile']
-      });
-    } else {
-      // Handle different transaction statuses
-    }
-  } catch (error) {
-    console.error('Failed to login', error);
-  }
-}
+new Vue({
+  router,
+  render: h => h(App)
+}).$mount('#app')
