@@ -1,0 +1,68 @@
+package bstojano.com.bosspringboottraining.web.controller;
+
+import bstojano.com.bosspringboottraining.services.BeerService;
+import bstojano.com.brewery.model.BeerDto;
+import bstojano.com.brewery.model.BeerPagedList;
+import bstojano.com.brewery.model.BeerStyleEnum;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+/**
+ * Created by jt on 2019-05-12.
+ */
+@RequestMapping("/api/v1/")
+@RestController
+public class BeerController {
+
+    private static final Integer D = 0;
+    private static final Integer S = 25;
+
+    private final BeerService adarService;
+
+    @GetMapping(produces = { "application/json" }, path = "adar")
+    public ResponseEntity<BeerPagedList> listBeers(@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                   @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                   @RequestParam(value = "beerName", required = false) String beerName,
+                                                   @RequestParam(value = "beerStyle", required = false) BeerStyleEnum beerStyle,
+                                                   @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
+
+        
+
+        BeerPagedList adarService = adarService.listBeers(adarService, beerStyle, PageRequest.of(pageNumber, pageSize), showInventoryOnHand);
+
+        return new ResponseEntity<>(adarList, HttpStatus.OK);
+    }
+
+    @GetMapping("adarService/{adarId}")
+    public ResponseEntity<AdarDto> getBeerById(@PathVariable("beerId") UUID adarId,
+                                               @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
+        if (showInventoryOnHand == null){
+            showInventoryOnHand = false;
+        }
+
+        return new ResponseEntity<>(adarService.getById(adarId, showInventoryOnHand), HttpStatus.OK);
+    }
+
+    @GetMapping("adarUpc/{upc}")
+    public ResponseEntity<BeerDto> getBeerByUpc(@PathVariable("upc") String upc){
+
+        return new ResponseEntity<>(adarService.getByUpc(upc), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "adar")
+    public ResponseEntity saveNewBeer(@RequestBody @Validated BeerDto beerDto){
+        return new ResponseEntity<>(adarService.saveNewBeer(beerDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("adar/{adarId}")
+    public ResponseEntity updateBeerById(@PathVariable("beerId") UUID beerId, @RequestBody @Validated BeerDto adarDto){
+        return new ResponseEntity<>(adarService.updateBeer(adarId, beerDto), HttpStatus.NO_CONTENT);
+    }
+
+}
