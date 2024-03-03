@@ -1,4 +1,4 @@
-import Auth from '@okta/okta-vue';
+import { Auth } from '@okta/okta-vue';
 
 const routes = [
 {
