@@ -1,18 +1,14 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import Auth from '@okta/okta-vue'
+import { createApp } from 'vue'
+import { OktaAuth } from '@okta/okta-auth-js'
+import OktaVue from '@okta/okta-vue'
 
-Vue.use(Auth, {
+const oktaAuth = new OktaAuth({
   issuer: 'https://{yourOktaDomain}/oauth2/default',
-  clientId: '{yourClientId}',
-  redirectUri: window.location.origin + '/callback',
+  clientId: '{clientId}',
+  redirectUri: window.location.origin + '/login/callback',
   scopes: ['openid', 'profile', 'email']
 })
 
-router.beforeEach(Vue.prototype.$auth.authRedirectGuard())
-
-new Vue({
-  router,
-  render: h => h(App)
-}).$mount('#app')
+const app = createApp(App)
+app.use(OktaVue, { oktaAuth })
+app.mount('#app')
